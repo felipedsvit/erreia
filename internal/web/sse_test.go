@@ -2,7 +2,6 @@ package web
 
 import (
 	"context"
-	"errors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -55,20 +54,24 @@ func TestSSEBroadcastsCardUpdatedEvent(t *testing.T) {
 	srv := httptest.NewServer(handler)
 	defer srv.Close()
 
-	// Open the SSE stream in a goroutine.
+	// Open the SSE stream in a goroutine. The context is owned by the test so
+	// it can cancel the goroutine and join it before returning; logging from a
+	// goroutine after the test completes would panic.
 	streamBody := make(chan string, 4)
 	streamDone := make(chan struct{})
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer func() {
+		cancel()
+		<-streamDone
+	}()
 	go func() {
 		defer close(streamDone)
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
 		r2, _ := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL+"/events/board/b-1", nil)
 		for _, c := range cookies {
 			r2.AddCookie(c)
 		}
 		resp, err := http.DefaultClient.Do(r2)
 		if err != nil {
-			t.Logf("SSE client: %v", err)
 			return
 		}
 		defer resp.Body.Close()
@@ -95,9 +98,6 @@ func TestSSEBroadcastsCardUpdatedEvent(t *testing.T) {
 				}
 			}
 			if err != nil {
-				if !errors.Is(err, io.EOF) {
-					t.Logf("SSE body read: %v", err)
-				}
 				return
 			}
 		}
