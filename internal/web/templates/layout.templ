@@ -1,0 +1,41 @@
+package templates
+
+templ Layout(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title } · erreia</title>
+			<link rel="stylesheet" href="/static/css/app.css"/>
+			<script src="/static/js/htmx.min.js" defer></script>
+			<script src="/static/js/htmx-sse.js" defer></script>
+			<script src="/static/js/sortable.min.js" defer></script>
+		</head>
+		<body>
+			{ children... }
+		</body>
+	</html>
+}
+
+// AppLayout is the layout used by authenticated pages; it exposes the
+// CSRF token to inline scripts via a <meta> tag so Sortable.js and other
+// islands can include it in their requests.
+templ AppLayout(title string, csrfToken string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="csrf-token" content={ csrfToken }/>
+			<title>{ title } · erreia</title>
+			<link rel="stylesheet" href="/static/css/app.css"/>
+			<script src="/static/js/htmx.min.js" defer></script>
+			<script src="/static/js/htmx-sse.js" defer></script>
+			<script src="/static/js/sortable.min.js" defer></script>
+		</head>
+		<body>
+			{ children... }
+		</body>
+	</html>
+}

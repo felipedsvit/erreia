@@ -1,0 +1,22 @@
+# Build artifacts
+bin/
+dist/
+*.exe
+
+# Local env
+.env
+.env.local
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Go
+*.test
+*.out
+
+# Templ generated
+*_templ.go
+
+*.md

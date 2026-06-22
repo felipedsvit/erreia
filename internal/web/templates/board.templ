@@ -1,0 +1,150 @@
+package templates
+
+import (
+	"github.com/felipedsvit/erreia/internal/board"
+	"github.com/felipedsvit/erreia/internal/user"
+)
+
+templ Me(u *user.User) {
+	@AppLayout("Profile", u.CSRFToken) {
+		<div class="app-shell">
+			@Sidebar(u, "/me")
+			<main class="app-main">
+				<h1 class="h2">Profile</h1>
+				<div class="mt-8 surface surface-pad surface-narrow">
+					<div class="row gap-5">
+						@Avatar(u, "avatar-lg")
+						<div>
+							<p class="h3">{ u.DisplayName }</p>
+							<p class="mt-1 muted">{ u.Email }</p>
+						</div>
+					</div>
+					<form method="post" action="/me/avatar" enctype="multipart/form-data" class="mt-6 space-y-3">
+						<input type="hidden" name="csrf_token" value={ u.CSRFToken }/>
+						<label class="label">Update avatar</label>
+						<input type="file" name="avatar" accept="image/png,image/jpeg,image/webp" required class="file-input"/>
+						<button type="submit" class="btn btn-primary">Upload</button>
+					</form>
+				</div>
+			</main>
+		</div>
+	}
+}
+
+templ BoardView(u *user.User, b *board.Board) {
+	@AppLayout(b.Title, u.CSRFToken) {
+		<div class="app-shell">
+			@Sidebar(u, "")
+			<main class="app-main app-main--tight">
+				<header class="mb-6 row between">
+					<div>
+						<a href="/dashboard" class="subtle">← Boards</a>
+						<h1 class="mt-1 h2">{ b.Title }</h1>
+					</div>
+				</header>
+				<div
+					hx-ext="sse"
+					sse-connect={ templ.SafeURL("/events/board/" + b.ID) }
+					sse-swap="card-updated"
+					hx-target="#board"
+					hx-swap="none"
+					class="scroll-x"
+				>
+					<div id="board" class="board" sse-swap="board-replaced">
+						@BoardFragment(b, u.CSRFToken)
+					</div>
+				</div>
+				<script src="/static/js/board.js" defer></script>
+			</main>
+		</div>
+	}
+}
+
+templ BoardFragment(b *board.Board, csrfToken string) {
+	for _, col := range b.Columns {
+		@ColumnFragment(b.ID, col, csrfToken)
+	}
+	<div class="add-column">
+		<form method="post" action={ templ.SafeURL("/boards/" + b.ID + "/columns") } class="surface surface-dashed surface-pad-md">
+			<input type="hidden" name="csrf_token" value={ csrfToken }/>
+			<input type="text" name="title" placeholder="Add column" required class="input input-sm"/>
+			<button type="submit" class="mt-2 btn btn-block btn-ghost btn-sm">Add column</button>
+		</form>
+	</div>
+}
+
+templ ColumnFragment(boardID string, col board.Column, csrfToken string) {
+	<div id={ "col-" + col.ID } class="column">
+		<header class="column-header">
+			<h3 class="column-title">{ col.Title }</h3>
+			<span class="column-count">{ len(col.Cards) }</span>
+		</header>
+		<div
+			id={ "cards-" + col.ID }
+			data-cards
+			data-column-id={ col.ID }
+			class="column-body"
+		>
+			for _, card := range col.Cards {
+				@CardView(card)
+			}
+		</div>
+		<form method="post" action={ templ.SafeURL("/columns/" + col.ID + "/cards") } class="add-card">
+			<input type="hidden" name="csrf_token" value={ csrfToken }/>
+			<input type="text" name="title" placeholder="Add card" required class="input input-sm grow"/>
+			<button type="submit" class="btn btn-primary btn-icon">+</button>
+		</form>
+	</div>
+}
+
+templ CardView(c board.Card) {
+	<div id={ "card-" + c.ID } data-card-id={ c.ID } class="card-item">
+		<div class="row start between gap-2">
+			<p class="card-item-title">{ c.Title }</p>
+			<button
+				type="button"
+				class="btn-link"
+				hx-get={ templ.SafeURL("/cards/" + c.ID + "/edit") }
+				hx-target={ "#card-" + c.ID }
+				hx-swap="outerHTML"
+			>edit</button>
+		</div>
+		if c.Description != "" {
+			<p class="card-item-desc prewrap">{ c.Description }</p>
+		}
+	</div>
+}
+
+templ CardEdit(c board.Card, csrfToken string) {
+	<form
+		id={ "card-" + c.ID }
+		data-card-id={ c.ID }
+		method="post"
+		action={ templ.SafeURL("/cards/" + c.ID) }
+		hx-post={ templ.SafeURL("/cards/" + c.ID) }
+		hx-target={ "#card-" + c.ID }
+		hx-swap="outerHTML"
+		class="card-item-edit"
+	>
+		<input type="hidden" name="csrf_token" value={ csrfToken }/>
+		<input type="text" name="title" value={ c.Title } required class="input input-sm"/>
+		<textarea name="description" rows="3" placeholder="Description" class="input input-xs input-textarea">{ c.Description }</textarea>
+		<div class="card-actions">
+			<button type="submit" class="btn btn-primary btn-xs">Save</button>
+			<button
+				type="button"
+				class="btn btn-secondary btn-xs"
+				hx-get={ templ.SafeURL("/cards/" + c.ID) }
+				hx-target={ "#card-" + c.ID }
+				hx-swap="outerHTML"
+			>Cancel</button>
+			<button
+				type="button"
+				class="btn btn-danger btn-xs ml-auto"
+				hx-delete={ templ.SafeURL("/cards/" + c.ID) }
+				hx-headers={ "{\"X-CSRF-Token\":\"" + csrfToken + "\"}" }
+				hx-confirm="Delete this card?"
+			>Delete</button>
+		</div>
+	</form>
+}

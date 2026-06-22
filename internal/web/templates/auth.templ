@@ -1,0 +1,57 @@
+package templates
+
+templ LoginForm(csrfToken string, errorMsg string) {
+	@Layout("Sign in") {
+		<main class="page-center page-narrow">
+			<div class="surface surface-pad">
+				<h1 class="h2">Sign in</h1>
+				if errorMsg != "" {
+					<div class="mt-4 alert alert-error">{ errorMsg }</div>
+				}
+				<form method="post" action="/login" class="mt-6 field-group">
+					<input type="hidden" name="csrf_token" value={ csrfToken }/>
+					<div class="field">
+						<label class="label">Email</label>
+						<input type="email" name="email" required class="input"/>
+					</div>
+					<div class="field">
+						<label class="label">Password</label>
+						<input type="password" name="password" required class="input"/>
+					</div>
+					<button type="submit" class="btn btn-block btn-primary">Sign in</button>
+				</form>
+				<p class="mt-4 subtle">No account? <a href="/register" class="link">Create one</a></p>
+			</div>
+		</main>
+	}
+}
+
+templ RegisterForm(csrfToken string, errorMsg string) {
+	@Layout("Create account") {
+		<main class="page-center page-narrow">
+			<div class="surface surface-pad">
+				<h1 class="h2">Create your account</h1>
+				if errorMsg != "" {
+					<div class="mt-4 alert alert-error">{ errorMsg }</div>
+				}
+				<form method="post" action="/register" class="mt-6 field-group">
+					<input type="hidden" name="csrf_token" value={ csrfToken }/>
+					<div class="field">
+						<label class="label">Display name</label>
+						<input type="text" name="display_name" required minlength="2" class="input"/>
+					</div>
+					<div class="field">
+						<label class="label">Email</label>
+						<input type="email" name="email" required class="input"/>
+					</div>
+					<div class="field">
+						<label class="label">Password</label>
+						<input type="password" name="password" required minlength="8" class="input"/>
+					</div>
+					<button type="submit" class="btn btn-block btn-primary">Create account</button>
+				</form>
+				<p class="mt-4 subtle">Already have one? <a href="/login" class="link">Sign in</a></p>
+			</div>
+		</main>
+	}
+}

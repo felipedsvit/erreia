@@ -1,0 +1,31 @@
+# Version control
+.git/
+.gitignore
+
+# Environment
+.env
+.env.example
+
+# CI / tooling
+.github/
+
+# Build & runtime artifacts
+tmp/
+*.test
+*.out
+/vendor/
+/bin/
+
+# Documentation (not needed at build time)
+README.md
+PERF.md
+AGENTS.md
+tasks.md
+SKILL.md
+
+# Docker (not part of the app)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+compose*.yaml
+compose*.yml

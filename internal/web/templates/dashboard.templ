@@ -1,0 +1,83 @@
+package templates
+
+import "github.com/felipedsvit/erreia/internal/user"
+
+templ Dashboard(u *user.User, boards []user.Board) {
+	@AppLayout("Dashboard", u.CSRFToken) {
+		<div class="app-shell">
+			@Sidebar(u, "/dashboard")
+			<main class="app-main">
+				<header class="row between">
+					<div>
+						<h1 class="h2">Boards</h1>
+						<p class="subtle">Pick a board or start a new one.</p>
+					</div>
+					<form method="post" action="/boards" class="row gap-2">
+						<input type="hidden" name="csrf_token" value={ u.CSRFToken }/>
+						<input type="text" name="title" required placeholder="New board title" class="input input-auto"/>
+						<button type="submit" class="btn btn-primary">Create</button>
+					</form>
+				</header>
+				<section class="board-grid">
+					if len(boards) == 0 {
+						<div class="col-span-full surface surface-dashed surface-empty">
+							No boards yet. Create your first one above.
+						</div>
+					}
+					for _, b := range boards {
+						<a href={ templ.SafeURL("/boards/" + b.ID) } class="surface surface-pad-sm surface-link">
+							<h2 class="h3">{ b.Title }</h2>
+							<p class="mt-1 subtle">updated { b.UpdatedAt.Format("Jan 2 15:04") }</p>
+						</a>
+					}
+				</section>
+			</main>
+		</div>
+	}
+}
+
+templ Sidebar(u *user.User, active string) {
+	<aside class="sidebar">
+		<a href="/dashboard" class="sidebar-brand">erreia</a>
+		<nav class="sidebar-nav">
+			<a href="/dashboard" class={ navClass(active == "/dashboard") }>Boards</a>
+			<a href="/me" class={ navClass(active == "/me") }>Profile</a>
+		</nav>
+		<div class="sidebar-profile">
+			@Avatar(u, "avatar-sm")
+			<div class="grow">
+				<p class="truncate sidebar-name">{ u.DisplayName }</p>
+				<p class="truncate subtle">{ u.Email }</p>
+			</div>
+		</div>
+		<form method="post" action="/logout" class="sidebar-logout">
+			<input type="hidden" name="csrf_token" value={ u.CSRFToken }/>
+			<button type="submit" class="btn btn-block btn-left btn-ghost btn-sm">Sign out</button>
+		</form>
+	</aside>
+}
+
+templ Avatar(u *user.User, class string) {
+	if u.AvatarURL != "" {
+		<img src={ templ.SafeURL(u.AvatarURL) } alt="avatar" class={ "avatar " + class }/>
+	} else {
+		<div class={ "avatar " + class }>
+			{ initial(u.DisplayName) }
+		</div>
+	}
+}
+
+func navClass(active bool) string {
+	if active {
+		return "sidebar-link active"
+	}
+	return "sidebar-link"
+}
+
+func initial(name string) string {
+	if name == "" {
+		return "?"
+	}
+	r := []rune(name)
+	return string([]rune{r[0]})
+}
