@@ -114,7 +114,7 @@ func (s *Server) handleAvatarImage(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 	w.Header().Set("Content-Type", contentType)
 	w.Header().Set("Cache-Control", "private, max-age=300")
 	_, _ = io.Copy(w, body)
@@ -273,7 +273,7 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "missing avatar file", http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	key, err := s.avatarUploader.Upload(r.Context(), u.ID, hdr.Header.Get("Content-Type"), file)
 	if err != nil {

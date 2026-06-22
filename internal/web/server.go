@@ -43,6 +43,7 @@ func New(cfg *config.Config, logger *slog.Logger, session *scs.SessionManager, d
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
+	//nolint:staticcheck // app runs behind a trusted TLS-terminating reverse proxy that sets X-Forwarded-For; see deployment notes.
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(requestLogger(logger))

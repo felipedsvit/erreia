@@ -58,9 +58,7 @@ func (h *Hub) Subscribe(boardID string) (<-chan Event, func()) {
 	cancel := func() {
 		h.mu.Lock()
 		if room, ok := h.rooms[boardID]; ok {
-			if _, ok := room[ch]; ok {
-				delete(room, ch)
-			}
+			delete(room, ch)
 			if len(room) == 0 {
 				delete(h.rooms, boardID)
 			}

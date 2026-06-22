@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"sync"
 	"testing"
@@ -184,20 +185,6 @@ func TestPasswordHashIsArgon2id(t *testing.T) {
 	}
 }
 
-// errorIs is a tiny local helper so we can avoid importing errors in
-// the test file twice. The errors.Is function works fine; this is just
-// sugar to keep the import list short.
 func errorIs(err, target error) bool {
-	for e := err; e != nil; {
-		if e == target {
-			return true
-		}
-		type unwrapper interface{ Unwrap() error }
-		if u, ok := e.(unwrapper); ok {
-			e = u.Unwrap()
-			continue
-		}
-		return false
-	}
-	return false
+	return errors.Is(err, target)
 }

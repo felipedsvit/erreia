@@ -4,9 +4,10 @@ APP  := erreia
 PKG  := ./...
 
 GITHUB_TOKEN ?=
+GH_TOKEN     ?= $(GITHUB_TOKEN)
 GITHUB_REPO  ?= felipedsvit/erreia
 
-.PHONY: help tidy templ js build run dev compose-up compose-down compose-logs fmt vet test coverage lint test-pg-up test-pg-down clean pull
+.PHONY: help tidy templ js build run dev compose-up compose-down compose-logs fmt vet test coverage lint test-pg-up test-pg-down clean pull ci ci-checks ci-build act act-build
 
 help:
 	@echo "Targets:"
@@ -18,7 +19,11 @@ help:
 	@echo "  compose-up    - start app + postgres + minio via docker compose"
 	@echo "  compose-down  - stop everything"
 	@echo "  fmt vet test  - standard Go chores"
-	@echo "  pull          - auth with gh and push to github (requires GITHUB_TOKEN=ghp_...)"
+	@echo "  pull          - push to github (requires GITHUB_TOKEN=ghp_... or GH_TOKEN=ghp_...)"
+	@echo "  ci            - run full CI locally (checks + docker build) via docker compose"
+	@echo "  ci-checks     - run the test job (templ, vet, lint, unit + integration) in docker"
+	@echo "  act           - run the real workflow 'test' job locally via nektos/act"
+	@echo "  act-build     - run build-and-push (as pull_request, builds without publishing)"
 
 tidy:
 	go mod tidy
@@ -91,14 +96,31 @@ lint:
 clean:
 	rm -rf bin
 
+ci: ci-checks ci-build
+
+ci-checks:
+	HOST_UID=$$(id -u) HOST_GID=$$(id -g) \
+	  docker compose -f docker/docker-compose.ci.yml up --build --abort-on-container-exit --exit-code-from ci; \
+	  status=$$?; \
+	  docker compose -f docker/docker-compose.ci.yml down -v; \
+	  exit $$status
+
+ci-build:
+	docker build -t erreia:ci .
+
+act:
+	gh act -j test
+
+act-build:
+	gh act pull_request -j build-and-push
+
 pull:
-	@if [ -z "$(GITHUB_TOKEN)" ]; then \
-	  echo "ERROR: GITHUB_TOKEN is required. Run: make pull GITHUB_TOKEN=ghp_..."; \
+	@if [ -z "$(GH_TOKEN)" ]; then \
+	  echo "ERROR: GH_TOKEN is required. Run: make pull GH_TOKEN=ghp_..."; \
 	  exit 1; \
 	fi
-	@echo "$(GITHUB_TOKEN)" | gh auth login --with-token
 	@git branch -m master main 2>/dev/null || true
-	@gh repo create $(GITHUB_REPO) --public --source=. --remote=origin 2>/dev/null || \
+	@GH_TOKEN=$(GH_TOKEN) gh repo create $(GITHUB_REPO) --public --source=. --remote=origin 2>/dev/null || \
 	  git remote set-url origin https://github.com/$(GITHUB_REPO).git 2>/dev/null || \
 	  git remote add origin https://github.com/$(GITHUB_REPO).git
 	@git push -u origin main

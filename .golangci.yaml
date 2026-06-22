@@ -1,50 +1,21 @@
+version: "2"
+
 run:
   timeout: 5m
 
 linters:
+  default: standard
   enable:
-    - errcheck
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - typecheck
-    - unused
-    - gofmt
-    - goimports
+    - bodyclose
+    - errorlint
+    - gosec
     - misspell
     - unconvert
-    - whitespace
-    - asasalint
-    - asciicheck
-    - bidichk
-    - bodyclose
-    - durationcheck
-    - errname
-    - errorlint
-    - execinquery
-    - forbidigo
-    - gocritic
-    - godot
-    - goheader
-    - goimports
-    - gomnd
-    - goprintffuncname
-    - gosec
-    - grouper
-    - nolintlint
-    - prealloc
-    - revive
-    - stylecheck
-    - tagliatelle
-    - wsl
-
-issues:
-  exclude-dirs:
-    - node_modules
-  exclude-rules:
-    - path: "_test\\.go"
-      linters:
-        - gosec
-        - gocritic
-  max-same-issues: 10
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+          - gocritic
+          - unused

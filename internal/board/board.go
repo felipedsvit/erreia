@@ -53,7 +53,7 @@ func (r *Repo) CreateBoard(ctx context.Context, ownerID, title string) (*Board, 
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	var b Board
 	if err := tx.QueryRow(ctx, `
@@ -272,7 +272,7 @@ func (r *Repo) MoveCard(ctx context.Context, cardID, destColumnID string, destPo
 	if err != nil {
 		return nil, "", err
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	var srcColumnID string
 	var srcPos int

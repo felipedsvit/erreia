@@ -90,18 +90,7 @@ jobs:
           go-version: '1.25'
           cache: true
 
-      - name: Generate Templ templates
-        run: go tool templ generate
-
-      - name: Run tests
+      - name: Run CI checks
         env:
           ERREIA_TEST_DATABASE_URL: postgres://erreia:erreia@localhost:5432/erreia?sslmode=disable
-        run: |
-          make test
-          make test-integration
-
-      - name: Run linter
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: v1.65.0
-          args: --timeout=5m
+        run: bash docker/ci.sh

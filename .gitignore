@@ -7,6 +7,10 @@ dist/
 .env
 .env.local
 
+# act (local GitHub Actions) secrets
+.secrets
+.env.act
+
 # OS / editor
 .DS_Store
 .idea/
@@ -20,3 +24,4 @@ dist/
 *_templ.go
 
 *.md
+!AGENTS.md

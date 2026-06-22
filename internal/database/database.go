@@ -61,7 +61,7 @@ func runMigrations(databaseURL string) error {
 	if err != nil {
 		return fmt.Errorf("sql open: %w", err)
 	}
-	defer sqlDB.Close()
+	defer func() { _ = sqlDB.Close() }()
 
 	driver, err := postgres.WithInstance(sqlDB, &postgres.Config{})
 	if err != nil {
