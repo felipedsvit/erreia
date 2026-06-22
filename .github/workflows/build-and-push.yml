@@ -90,6 +90,9 @@ jobs:
           go-version: '1.25'
           cache: true
 
+      - name: Generate Templ templates
+        run: go tool templ generate
+
       - name: Run tests
         env:
           ERREIA_TEST_DATABASE_URL: postgres://erreia:erreia@localhost:5432/erreia?sslmode=disable
