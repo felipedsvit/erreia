@@ -1,0 +1,5 @@
+# Re-include markdown files for Jekyll site
+!*.md
+_site/
+.jekyll-cache/
+.jekyll-metadata

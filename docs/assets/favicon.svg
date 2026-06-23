@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- fundo escuro -->
+  <rect width="32" height="32" rx="5" fill="#0f172a"/>
+  <!-- balão de chat -->
+  <path d="M5 4 H27 A2 2 0 0 1 29 6 V20 A2 2 0 0 1 27 22 H14 L9 28 L9 22 H7 A2 2 0 0 1 5 20 V6 A2 2 0 0 1 7 4 Z"
+        fill="none" stroke="#3cd6a0" stroke-width="2" stroke-linejoin="round"/>
+  <!-- letra M -->
+  <polyline points="9,17 9,9 16,15 23,9 23,17"
+            fill="none" stroke="#3cd6a0" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

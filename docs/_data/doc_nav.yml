@@ -1,0 +1,13 @@
+- group: Guias
+  pages:
+    - title: Quickstart
+      url: /erreia/docs/quickstart/
+    - title: Configuração
+      url: /erreia/docs/configuracao/
+
+- group: Referência
+  pages:
+    - title: Arquitetura
+      url: /erreia/docs/arquitetura/
+    - title: API
+      url: /erreia/docs/api/

@@ -1,0 +1,32 @@
+title: Erreia
+description: Kanban minimalista em Go — SSE + Postgres LISTEN/NOTIFY, auth Argon2id, avatares MinIO.
+url: https://felipedsvit.github.io
+baseurl: /erreia
+lang: pt-BR
+
+author:
+  name: Felipe Dsvit
+  github: felipedsvit
+
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: highlight
+    block:
+      line_numbers: false
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-relative-links
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - Makefile
+  - vendor/
+  - .bundle/
+  - .jekyll-cache/
