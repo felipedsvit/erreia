@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>erreia · Kanban leve em Go</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --bg: #0d1117; --bg2: #161b22; --fg: #c9d1d9; --fg2: #8b949e; --accent: #58a6ff; --accent2: #3fb950; --border: #30363d; --radius: 8px; --max-w: 860px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.7; }
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
+    .navbar { border-bottom: 1px solid var(--border); padding: 14px 0; background: var(--bg); position: sticky; top: 0; z-index: 10; }
+    .navbar .container { display: flex; align-items: center; gap: 24px; }
+    .navbar a { color: var(--fg2); text-decoration: none; font-size: 0.9rem; }
+    .navbar a:hover { color: var(--accent); }
+    .navbar .logo { color: var(--fg); font-weight: 700; margin-right: auto; }
+    h1 { font-size: 2rem; margin: 40px 0 8px; }
+    h1 span { color: var(--fg2); font-weight: 400; }
+    h2 { font-size: 1.3rem; margin: 36px 0 16px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    h3 { font-size: 1.05rem; margin: 24px 0 10px; color: var(--fg); }
+    p { margin-bottom: 14px; color: var(--fg2); }
+    a { color: var(--accent); }
+    code { background: var(--bg2); padding: 2px 6px; border-radius: 4px; font-size: 0.88rem; }
+    pre { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-x: auto; margin-bottom: 16px; font-size: 0.85rem; }
+    pre code { background: none; padding: 0; }
+    ul, ol { margin-bottom: 14px; padding-left: 22px; color: var(--fg2); }
+    li { margin-bottom: 4px; }
+    .tag { display: inline-block; background: rgba(88,166,255,0.1); color: var(--accent); font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; margin: 2px; }
+    .tag-green { background: rgba(63,185,80,0.1); color: var(--accent2); }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .feature-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    .feature-card h4 { color: var(--accent2); margin-bottom: 6px; font-size: 0.95rem; }
+    .feature-card p { font-size: 0.88rem; }
+    .btn { display: inline-block; padding: 10px 20px; border-radius: var(--radius); text-decoration: none; font-size: 0.9rem; font-weight: 500; margin: 4px; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-outline { border: 1px solid var(--border); color: var(--fg); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .footer { border-top: 1px solid var(--border); padding: 20px 0; margin-top: 50px; text-align: center; color: var(--fg2); font-size: 0.8rem; }
+    @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <span class="logo">erreia</span>
+      <a href="#about">sobre</a>
+      <a href="#features">funcionalidades</a>
+      <a href="#stack">stack</a>
+      <a href="#docker">docker</a>
+      <a href="#quickstart">quickstart</a>
+      <a href="https://github.com/felipedsvit/erreia" target="_blank">github</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>erreia <span>· Kanban leve em Go</span></h1>
+    <p>
+      <span class="tag">Go</span>
+      <span class="tag">Templ</span>
+      <span class="tag">HTMX</span>
+      <span class="tag">SSE</span>
+      <span class="tag">Postgres</span>
+      <span class="tag-green">15 MB</span>
+    </p>
+
+    <p><strong>erreia</strong> é um sistema Kanban construído em Go com <strong>Templ + HTMX + SSE</strong> usando Postgres LISTEN/NOTIFY para atualizações em tempo real. Autenticação por sessão com Argon2id, avatares no MinIO e CSS escrito à mão. Binário único de <strong>15 MB</strong> — abaixo da meta de 40 MB.</p>
+
+    <a href="#quickstart" class="btn btn-primary">começar</a>
+    <a href="https://github.com/felipedsvit/erreia" class="btn btn-outline" target="_blank">código fonte</a>
+
+    <h2 id="about">sobre</h2>
+    <p>O nome "erreia" vem de uma brincadeira com "errei" em português — um aceno honesto à natureza iterativa do desenvolvimento. O projeto nasceu do desejo de construir uma aplicação web funcional completa em Go, do zero, sem frameworks JavaScript no frontend.</p>
+
+    <h2 id="features">funcionalidades</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Quadro Kanban</h4>
+        <p>Colunas customizáveis com drag & drop via HTMX e atualização SSE em tempo real.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Tempo real</h4>
+        <p>Postgres LISTEN/NOTIFY + SSE — sem WebSocket, sem polling. Múltiplos usuários veem mudanças instantaneamente.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Auth por sessão</h4>
+        <p>Argon2id para hash de senha, sessões seguras com HttpOnly cookies.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Avatares no MinIO</h4>
+        <p>Upload e serve de imagens via armazenamento S3-compatível (MinIO).</p>
+      </div>
+      <div class="feature-card">
+        <h4>Binário único</h4>
+        <p>15 MB, CGO-free, estático. Ideal para deploy em VPS, containers ou edge.</p>
+      </div>
+      <div class="feature-card">
+        <h4>CSS escrito à mão</h4>
+        <p>Sem frameworks CSS. Leve, sem dependências, carregamento instantâneo.</p>
+      </div>
+    </div>
+
+    <h2 id="stack">stack</h2>
+    <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2); width: 130px;">Linguagem</td>
+        <td style="padding: 8px 0;">Go 1.24+</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2);">Views</td>
+        <td style="padding: 8px 0;">Templ — componentes Go type-safe compilados para HTML</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2);">Frontend dinâmico</td>
+        <td style="padding: 8px 0;">HTMX — atributos HTML para interatividade sem JS</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2);">Tempo real</td>
+        <td style="padding: 8px 0;">SSE (Server-Sent Events) + Postgres LISTEN/NOTIFY</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2);">Banco</td>
+        <td style="padding: 8px 0;">Postgres 17 + pgx</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2);">Auth</td>
+        <td style="padding: 8px 0;">Sessão HttpOnly + Argon2id</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2);">Storage</td>
+        <td style="padding: 8px 0;">MinIO (S3-compatível)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0; color: var(--fg2);">Container</td>
+        <td style="padding: 8px 0;">Docker + Compose, multi-stage, CGO_ENABLED=0</td>
+      </tr>
+    </table>
+
+    <h2 id="docker">Docker</h2>
+    <p>O projeto inclui Docker multi-stage e docker-compose completos para development e produção.</p>
+
+    <h3>docker-compose.yaml (desenvolvimento)</h3>
+    <pre><code>version: "3.9"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: erreia
+      POSTGRES_USER: erreia
+      POSTGRES_PASSWORD: erreia
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file: .env
+    depends_on:
+      - postgres
+      - minio
+
+volumes:
+  pgdata:</code></pre>
+
+    <h3>docker-compose.prod.yaml (produção)</h3>
+    <p>Para produção, use o arquivo <code>docker-compose.prod.yaml</code> que inclui:</p>
+    <ul>
+      <li>Variáveis de ambiente de produção via <code>.env.prod</code></li>
+      <li>Postgres com volume persistente e backup</li>
+      <li>MinIO com configuração de produção</li>
+      <li>Imagem multi-stage otimizada (~15 MB)</li>
+    </ul>
+
+    <h3>Dockerfile multi-stage</h3>
+    <pre><code># Stage 1: Build
+FROM golang:1.24-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o /app/server ./cmd/server
+
+# Stage 2: Runtime
+FROM alpine:3.20
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /app/server /server
+EXPOSE 8080
+CMD ["/server"]</code></pre>
+
+    <h2 id="quickstart">quickstart</h2>
+    <p>Pré-requisitos: Go 1.24+, Docker, Docker Compose.</p>
+
+    <h3>1. Clone e configure</h3>
+    <pre><code>git clone https://github.com/felipedsvit/erreia.git
+cd erreia
+cp .env.example .env</code></pre>
+
+    <h3>2. Suba os serviços</h3>
+    <pre><code>docker compose up -d postgres minio
+# Aguarde os serviços ficarem prontos</code></pre>
+
+    <h3>3. Rode as migrações e inicie</h3>
+    <pre><code>go run ./cmd/server</code></pre>
+
+    <h3>4. Acesse</h3>
+    <pre><code># Abra no navegador:
+http://localhost:8080</code></pre>
+
+    <h3>Com Docker completo (recomendado)</h3>
+    <pre><code>docker compose up --build</code></pre>
+
+    <h3>Produção</h3>
+    <pre><code>cp .env.prod.example .env.prod
+# Edite .env.prod com suas configurações
+docker compose -f docker-compose.prod.yaml up -d --build</code></pre>
+
+    <h2>estrutura do projeto</h2>
+    <pre><code>erreia/
+├── cmd/server/          # entrypoint
+├── internal/
+│   ├── config/          # configuração (env/koanf)
+│   ├── handler/         # handlers HTTP (HTMX + JSON)
+│   ├── model/           # tipos de domínio
+│   ├── repository/      # acesso a dados (pgx)
+│   ├── service/         # lógica de negócio
+│   └── middleware/      # auth, session, CSRF
+├── web/
+│   ├── components/      # componentes Templ
+│   └── static/          # CSS, JS, imagens
+├── docker/              # scripts Docker auxiliares
+├── Dockerfile           # multi-stage build
+├── docker-compose.yaml  # dev stack
+├── docker-compose.prod.yaml  # prod stack
+├── Makefile             # comandos úteis
+└── go.mod</code></pre>
+
+    <h2>licença</h2>
+    <p>MIT — sinta-se livre para usar, modificar e distribuir.</p>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p><a href="https://github.com/felipedsvit/erreia">github.com/felipedsvit/erreia</a> · feito por felipedsvit</p>
+    </div>
+  </footer>
+</body>
+</html>
